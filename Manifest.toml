@@ -83,7 +83,9 @@ version = "6.4.0"
 
 [[GPUCompiler]]
 deps = ["DataStructures", "ExprTools", "InteractiveUtils", "LLVM", "Libdl", "Logging", "Scratch", "Serialization", "TimerOutputs", "UUIDs"]
-git-tree-sha1 = "6eadd2321dc3ac0fc9d530ab01c2caa7fe5d74c6"
+git-tree-sha1 = "fed525e972c02f372bef8d7d95adf2fcc7d6a670"
+repo-rev = "tb/byval_sp"
+repo-url = "https://github.com/JuliaGPU/GPUCompiler.jl.git"
 uuid = "61eb1bfa-7361-4325-ad38-22787b887f55"
 version = "0.11.4"
 
@@ -99,9 +101,9 @@ version = "1.3.0"
 
 [[LLVM]]
 deps = ["CEnum", "Libdl", "Printf", "Unicode"]
-git-tree-sha1 = "b616937c31337576360cb9fb872ec7633af7b194"
+git-tree-sha1 = "a220efe4a6bc1c71809d002eb9ed9209ce5a86fb"
 uuid = "929cbde3-209d-540e-8aea-75f648917ca0"
-version = "3.6.0"
+version = "3.7.0"
 
 [[LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]

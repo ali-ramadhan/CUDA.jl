@@ -17,7 +17,7 @@ function CUDACompilerTarget(dev::CuDevice; kwargs...)
         exitable = false
     end
 
-    debuginfo = false
+    debuginfo = true
 
     PTXCompilerTarget(; cap, ptx, exitable, debuginfo, kwargs...)
 end
