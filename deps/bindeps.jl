@@ -35,7 +35,9 @@ toolkit_release() = @after_init(VersionNumber(__toolkit_version[].major, __toolk
 # if using a local toolkit, this contains a list of relevant directories
 const __toolkit_dirs = Ref{Vector{String}}()
 
+const __ptxas = Ref{String}()
 const __nvdisasm = Ref{String}()
+const __nvlink = Ref{String}()
 const __compute_sanitizer = Ref{Union{Nothing,String}}()
 const __libdevice = Ref{String}()
 const __libcudadevrt = Ref{String}()
@@ -48,7 +50,9 @@ const __libcufft = Ref{String}()
 const __libcurand = Ref{String}()
 const __libcusolverMg = Ref{Union{Nothing,String}}(nothing)
 
+ptxas() = @after_init(__ptxas[])
 nvdisasm() = @after_init(__nvdisasm[])
+nvlink() = @after_init(__nvlink[])
 function compute_sanitizer()
     @after_init begin
         has_compute_sanitizer() ||
@@ -179,8 +183,12 @@ function use_artifact_cuda()
             error("""Could not find $(basename(path)) in $(dirname(path))!
                      This is a bug; please file an issue with a verbose directory listing of $(dirname(path)).""")
 
+    __ptxas[] = artifact_binary(artifact.dir, "ptxas")
+    assert_artifact_file(__ptxas[])
     __nvdisasm[] = artifact_binary(artifact.dir, "nvdisasm")
     assert_artifact_file(__nvdisasm[])
+    __nvlink[] = artifact_binary(artifact.dir, "nvlink")
+    assert_artifact_file(__nvlink[])
     __compute_sanitizer[] = artifact_binary(artifact.dir, "compute-sanitizer")
 
     __libcupti[] = artifact_cuda_library(artifact.dir, "cupti", artifact.version)
@@ -222,12 +230,29 @@ function use_local_cuda()
     @debug "Trying to use local installation..."
 
     __toolkit_dirs[] = find_toolkit()
+
+    let path = find_cuda_binary("ptxas", __toolkit_dirs[])
+        if path === nothing
+            @debug "Could not find ptxas"
+            return false
+        end
+        __ptxas[] = path
+    end
+
     let path = find_cuda_binary("nvdisasm", __toolkit_dirs[])
         if path === nothing
             @debug "Could not find nvdisasm"
             return false
         end
         __nvdisasm[] = path
+    end
+
+    let path = find_cuda_binary("nvlink", __toolkit_dirs[])
+        if path === nothing
+            @debug "Could not find nvlink"
+            return false
+        end
+        __nvlink[] = path
     end
 
     __compute_sanitizer[] = find_cuda_binary("compute-sanitizer", __toolkit_dirs[])
