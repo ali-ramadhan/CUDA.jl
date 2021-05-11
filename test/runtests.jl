@@ -2,6 +2,7 @@ using Distributed
 using Dates
 import REPL
 using Printf: @sprintf
+using TimerOutputs
 
 # parse some command-line arguments
 function extract_flag!(args, flag, default=nothing)
@@ -311,6 +312,7 @@ end
 # run tasks
 results = []
 all_tasks = Task[]
+timings = TimerOutput[]
 try
     # Monitor stdin and kill this task on ^C
     # but don't do this on Windows, because it may deadlock in the kernel
@@ -388,6 +390,13 @@ try
                         rm(snoop[1])
                     end
                 end
+
+                # fetch worker timings
+                to = remotecall_fetch(p) do
+                    CUDA.to
+                end
+                push!(timings, to)
+
                 if p != 1
                     # Free up memory =)
                     rmprocs(p, waitfor=30)
@@ -422,6 +431,14 @@ finally
         schedule(stdin_monitor, InterruptException(); error=true)
     end
 end
+
+# report work timings
+for to in timings
+    TimerOutputs.merge!(CUDA.to, to)
+end
+TimerOutputs.complement!(CUDA.to)
+@info """CUDA.jl timings:
+         $(CUDA.to)"""
 
 # construct a testset to render the test results
 o_ts = Test.DefaultTestSet("Overall")
@@ -494,4 +511,3 @@ else
     Test.print_test_errors(o_ts)
     throw(Test.FallbackTestSetException("Test run finished with errors"))
 end
-
