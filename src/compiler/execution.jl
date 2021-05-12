@@ -296,9 +296,13 @@ const cufunction_cache = PerDevice{Dict{UInt, Any}}((dev)->Dict{UInt, Any}())
 # compile to executable machine code
 @timeit_debug to "compile" function cufunction_compile(@nospecialize(job::CompilerJob))
     # lower to PTX
+    @timeit_debug to "GPUCompiler.jl" begin
     method_instance, world = @timeit_debug to "emit_julia" GPUCompiler.emit_julia(job)
     ir, kernel = @timeit_debug to "emit_llvm" GPUCompiler.emit_llvm(job, method_instance, world)
     code = @timeit_debug to "emit_asm" GPUCompiler.emit_asm(job, ir, kernel; format=LLVM.API.LLVMAssemblyFile)
+    end
+
+    @timeit_debug to "prep" begin
 
     # check if we'll need the device runtime
     undefined_fs = filter(collect(functions(ir))) do f
@@ -310,6 +314,8 @@ const cufunction_cache = PerDevice{Dict{UInt, Any}}((dev)->Dict{UInt, Any}())
 
     # find externally-initialized global variables; we'll access those using CUDA APIs.
     external_gvars = filter(isextinit, collect(globals(ir))) .|> LLVM.name
+
+    end
 
     # prepare invocations of CUDA compiler tools
     ptxas_cmd = `$(ptxas())`
@@ -344,7 +350,7 @@ const cufunction_cache = PerDevice{Dict{UInt, Any}}((dev)->Dict{UInt, Any}())
     ptx_input = tempname(cleanup=false) * ".ptx"
     ptxas_output = tempname(cleanup=false) * ".cubin"
     nvlink_output = tempname(cleanup=false) * ".cubin"
-    image = try
+    image = @timeit_debug to "CUDA" try
         write(ptx_input, code)
 
         arch = "sm_$(job.target.cap.major)$(job.target.cap.minor)"
@@ -390,9 +396,11 @@ const cufunction_cache = PerDevice{Dict{UInt, Any}}((dev)->Dict{UInt, Any}())
             read(ptxas_output)
         end
     finally
+        @timeit_debug to "clean-up" begin
         rm(ptx_input)
         ispath(ptxas_output) && rm(ptxas_output)
         ispath(nvlink_output) && rm(nvlink_output)
+        end
     end
 
     return (image, entry=LLVM.name(kernel), external_gvars)
