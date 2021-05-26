@@ -11,7 +11,7 @@ using ..CUSPARSE: cusparseMatDescr_t
 
 using CEnum
 
-using Memoization
+using Memoize
 
 using DataStructures
 

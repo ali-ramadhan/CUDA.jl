@@ -16,7 +16,7 @@ using LinearAlgebra
 
 using BFloat16s
 
-using Memoization
+using Memoize
 
 using ExprTools
 

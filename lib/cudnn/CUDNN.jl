@@ -15,7 +15,7 @@ using ..CUDA: libcudnn, @retry_reclaim, isdebug, @context!
 
 using CEnum
 
-using Memoization
+using Memoize
 
 using DataStructures
 

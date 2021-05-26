@@ -2,7 +2,7 @@ module Deps
 
 Base.Experimental.@compiler_options compile=min optimize=0 infer=false
 
-using Memoization
+using Memoize
 
 import ..CUDA
 import ..LLVM

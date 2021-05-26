@@ -2,7 +2,7 @@ using .APIUtils
 
 using CEnum
 
-using Memoization
+using Memoize
 
 using Printf
 

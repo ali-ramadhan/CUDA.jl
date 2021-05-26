@@ -6,7 +6,7 @@ using ..CUDA
 
 using CEnum
 
-using Memoization
+using Memoize
 
 using Libdl
 

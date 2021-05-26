@@ -8,7 +8,7 @@ using ..CUDA: libcusparse, unsafe_free!, @retry_reclaim, @context!
 
 using CEnum
 
-using Memoization
+using Memoize
 
 using LinearAlgebra
 using LinearAlgebra: HermOrSym

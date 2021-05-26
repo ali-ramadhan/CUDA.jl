@@ -14,7 +14,7 @@ using BFloat16s
 
 using CEnum
 
-using Memoization
+using Memoize
 
 using DataStructures
 

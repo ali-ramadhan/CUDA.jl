@@ -12,7 +12,7 @@ using Base: @deprecate_binding
 
 using Printf
 
-using Memoization
+using Memoize
 
 using DataStructures
 
